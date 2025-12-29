@@ -141,7 +141,16 @@ on:
         description: "是否停用此次Ccache？"
         required: true
         default: false
-
+      KVM:
+        type: boolean
+        description: "是否启用KVM支持？"
+        required: true
+        default: false
+      PKVM:
+        type: boolean
+        description: "是否启用PKVM支持？"
+        required: true
+        default: false
 jobs:
   build:
     name: ${{ github.event.inputs.FAST_BUILD == 'true' && ' [FAST]' || '' }}${{ github.event.inputs.KPM == 'true' && ' [KPM]' || '' }}${{ github.event.inputs.LSM == 'true' && ' [LSM]' || '' }}${{ github.event.inputs.SCHED == 'true' && ' [SCHED]' || '' }}${{ github.event.inputs.ZRAM == 'true' && ' [ZRAM]' || '' }}For ${{ github.event.inputs.FILE }} ${{ github.event.inputs.SUFFIX }}
@@ -812,6 +821,21 @@ jobs:
             echo "CONFIG_CRYPTO_842=y" >> "$CONFIG_FILE"
             echo "CONFIG_CRYPTO_LZ4K_OPLUS=y" >> "$CONFIG_FILE"
             echo "CONFIG_ZRAM_WRITEBACK=y" >> "$CONFIG_FILE"
+          fi
+          # ===== KVM 支持配置（根据开关勾选）=====
+          if [ "${{ github.event.inputs.KVM }}" = "true" ]; then
+            echo "CONFIG_KVM=y" >> "$CONFIG_FILE"
+            echo "CONFIG_KVM_ARM=y" >> "$CONFIG_FILE"
+            echo "CONFIG_KVM_VFIO=y" >> "$CONFIG_FILE"
+            echo "CONFIG_HAVE_KVM_IRQCHIP=y" >> "$CONFIG_FILE"
+            echo "CONFIG_HAVE_KVM_IRQFD=y" >> "$CONFIG_FILE"
+            echo "CONFIG_HAVE_KVM_IRQ_ROUTING=y" >> "$CONFIG_FILE"
+            echo "CONFIG_HAVE_KVM_EVENTFD=y" >> "$CONFIG_FILE"
+          fi
+
+          # ===== PKVM 支持配置（根据开关勾选）=====
+          if [ "${{ github.event.inputs.PKVM }}" = "true" ]; then
+            echo "CONFIG_PKVM=y" >> "$CONFIG_FILE"
           fi
 
           # LSM配置*
